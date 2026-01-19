@@ -1,9 +1,297 @@
-  <div class="card">
-    <h3>🎯 Progress Target Menabung</h3>
-    <div style="background:#eee;border-radius:12px;overflow:hidden;height:16px">
-      <div id="progressBar" style="height:16px;width:0%;background:#3498db;transition:.4s"></div>
-    </div>
-    <p style="margin-top:8px;font-size:13px">
-      <span id="progressText">0%</span> tercapai
-    </p>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Adit Menabung</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:"Segoe UI",Arial,sans-serif;
+      background:#f2f4f8;
+    }
+
+    /* HEADER */
+    .header{
+      background:linear-gradient(135deg,#3f8efc,#6fa8ff);
+      color:white;
+      padding:32px 20px 50px;
+      border-bottom-left-radius:28px;
+      border-bottom-right-radius:28px;
+    }
+    .header h1{margin:0;font-size:26px}
+    .header p{margin-top:6px;opacity:.9}
+
+    /* CONTENT */
+    .content{padding:20px;padding-bottom:100px}
+
+    /* CARD */
+    .card{
+      background:white;
+      border-radius:20px;
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 8px 16px rgba(0,0,0,.08);
+    }
+    .card h3{margin:0 0 10px}
+
+    /* SUMMARY */
+    .summary{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .summary div{
+      padding:14px;
+      border-radius:16px;
+      color:white;
+      font-size:14px;
+    }
+    .income{background:#f39c12}
+    .expense{background:#e74c3c}
+    .saldo{background:#1abc9c}
+    .target{background:#3498db}
+
+    /* FORM */
+    input,button{
+      width:100%;
+      padding:12px;
+      margin-top:8px;
+      border-radius:14px;
+      border:1px solid #ddd;
+      font-size:14px;
+    }
+    button{
+      background:#3f8efc;
+      color:white;
+      border:none;
+      margin-top:12px;
+    }
+
+    /* NAV */
+    .bottom-nav{
+      position:fixed;
+      bottom:0;left:0;right:0;
+      height:70px;
+      background:white;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      box-shadow:0 -5px 15px rgba(0,0,0,.1);
+    }
+    .bottom-nav button{
+      background:none;
+      border:none;
+      font-size:22px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>Adit Menabung Hehe💰</h1>
+    <p>Seng konsisten cok//Ambabung</p>
   </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="page">
+      <div class="summary">
+        <div class="income">💰 Pemasukan<br>Rp <span id="sumIn">0</span></div>
+        <div class="expense">💸 Pengeluaran<br>Rp <span id="sumOut">0</span></div>
+        <div class="saldo">💳 Saldo<br>Rp <span id="saldo">0</span></div>
+        <div class="target">🎯 Target<br>Rp <span id="targetVal">0</span></div>
+      </div>
+
+      <div class="card">
+        <h3>🎯 Progress Target Menabung</h3>
+        <div style="background:#eee;border-radius:12px;overflow:hidden;height:16px">
+          <div id="progressBar"
+               style="height:16px;width:0%;background:#3498db;transition:.4s">
+          </div>
+        </div>
+        <p style="margin-top:8px;font-size:13px">
+          <span id="progressText">0%</span> tercapai
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>📊 Ringkasan Keuangan</h3>
+        <canvas id="barChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>🥧 Tren Keuangan</h3>
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div id="input" class="page" style="display:none">
+      <div class="card">
+        <h3>➕ Input Pemasukan</h3>
+        <input type="number" id="inAmount" placeholder="Jumlah pemasukan">
+        <button onclick="addIncome()">Simpan</button>
+      </div>
+
+      <div class="card">
+        <h3>➖ Input Pengeluaran</h3>
+        <input type="number" id="outAmount" placeholder="Jumlah pengeluaran">
+        <button onclick="addExpense()">Simpan</button>
+      </div>
+    </div>
+
+    <!-- TARGET -->
+    <div id="target" class="page" style="display:none">
+      <div class="card">
+        <h3>🎯 Target Menabung</h3>
+        <input type="number" id="targetInput" placeholder="Target tabungan">
+        <button onclick="setTarget()">Simpan Target</button>
+      </div>
+    </div>
+
+    <!-- LAPORAN -->
+    <div id="report" class="page" style="display:none">
+      <div class="card">
+        <h3>📄 Laporan Keuangan</h3>
+        <p>Total Pemasukan: Rp <span id="rIn">0</span></p>
+        <p>Total Pengeluaran: Rp <span id="rOut">0</span></p>
+        <p>Saldo Akhir: Rp <span id="rSaldo">0</span></p>
+        <hr>
+        <p>🎯 Target tercapai dalam <b><span id="targetDays">-</span></b> hari</p>
+        <p>📅 Perkiraan tanggal tercapai:
+          <b><span id="targetDate">-</span></b>
+        </p>
+        <p style="font-size:13px;opacity:.7">
+          (Asumsi nabung Rp20.000 / hari)
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NAV -->
+  <div class="bottom-nav">
+    <button onclick="showPage('dashboard')">🏠</button>
+    <button onclick="showPage('input')">➕</button>
+    <button onclick="showPage('target')">🎯</button>
+    <button onclick="showPage('report')">📄</button>
+  </div>
+
+  <script>
+    let income = 0;
+    let expense = 0;
+    let target = 0;
+
+    const barChart = new Chart(document.getElementById("barChart"),{
+      type:"bar",
+      data:{
+        labels:["Pemasukan","Pengeluaran","Saldo"],
+        datasets:[{
+          data:[0,0,0],
+          backgroundColor:["#f39c12","#e74c3c","#1abc9c"]
+        }]
+      },
+      options:{plugins:{legend:{display:false}}}
+    });
+
+    const trendChart = new Chart(document.getElementById("trendChart"),{
+      type:"doughnut",
+      data:{
+        labels:["Pemasukan","Pengeluaran","Saldo"],
+        datasets:[{
+          data:[0,0,0],
+          backgroundColor:["#f39c12","#e74c3c","#1abc9c"]
+        }]
+      },
+      options:{plugins:{legend:{position:"bottom"}}}
+    });
+
+    function updateUI(){
+      const saldoVal = income - expense;
+
+      sumIn.textContent = income;
+      sumOut.textContent = expense;
+      saldo.textContent = saldoVal;
+      targetVal.textContent = target;
+
+      rIn.textContent = income;
+      rOut.textContent = expense;
+      rSaldo.textContent = saldoVal;
+
+      barChart.data.datasets[0].data = [income, expense, saldoVal];
+      barChart.update();
+
+      trendChart.data.datasets[0].data = [income, expense, Math.max(saldoVal,0)];
+      trendChart.update();
+
+      if(target > 0){
+        const percent = Math.min((saldoVal / target) * 100, 100);
+        progressBar.style.width = percent + "%";
+        progressText.textContent = percent.toFixed(1) + "%";
+      }else{
+        progressBar.style.width = "0%";
+        progressText.textContent = "0%";
+      }
+
+      const dailySave = 20000;
+      if(target > 0){
+        const remaining = target - saldoVal;
+        if(remaining <= 0){
+          targetDays.textContent = "Target sudah tercapai 🎉";
+          targetDate.textContent = "Hari ini";
+        }else{
+          const days = Math.ceil(remaining / dailySave);
+          targetDays.textContent = days;
+          const d = new Date();
+          d.setDate(d.getDate() + days);
+          targetDate.textContent = d.toLocaleDateString("id-ID");
+        }
+      }else{
+        targetDays.textContent = "-";
+        targetDate.textContent = "-";
+      }
+    }
+
+    function addIncome(){
+      const v = Number(inAmount.value);
+      if(v > 0){
+        income += v;
+        inAmount.value = "";
+        updateUI();
+      }
+    }
+
+    function addExpense(){
+      const v = Number(outAmount.value);
+      if(v > 0){
+        expense += v;
+        outAmount.value = "";
+        updateUI();
+      }
+    }
+
+    function setTarget(){
+      const v = Number(targetInput.value);
+      if(v > 0){
+        target = v;
+        updateUI();
+      }
+    }
+
+    function showPage(id){
+      document.querySelectorAll(".page")
+        .forEach(p => p.style.display = "none");
+      document.getElementById(id).style.display = "block";
+    }
+
+    showPage("dashboard");
+  </script>
+
+</body>
+</html>
+
