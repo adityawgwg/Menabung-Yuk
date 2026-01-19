@@ -8,85 +8,40 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:"Segoe UI",Arial,sans-serif;
-  background:#f2f4f8;
-}
-
-/* HEADER */
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:#f2f4f8}
 .header{
   background:linear-gradient(135deg,#3f8efc,#6fa8ff);
-  color:white;
-  padding:32px 20px 50px;
-  border-bottom-left-radius:28px;
-  border-bottom-right-radius:28px;
+  color:white;padding:32px 20px 50px;
+  border-bottom-left-radius:28px;border-bottom-right-radius:28px
 }
 .header h1{margin:0;font-size:26px}
 .header p{margin-top:6px;opacity:.9}
-
-/* CONTENT */
-.content{padding:20px;padding-bottom:100px}
-
-/* CARD */
+.content{padding:20px;padding-bottom:120px}
 .card{
-  background:white;
-  border-radius:20px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 8px 16px rgba(0,0,0,.08);
+  background:white;border-radius:20px;padding:16px;
+  margin-bottom:16px;box-shadow:0 8px 16px rgba(0,0,0,.08)
 }
 .card h3{margin:0 0 10px}
-
-/* SUMMARY */
-.summary{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .summary div{
-  padding:14px;
-  border-radius:16px;
-  color:white;
-  font-size:14px;
+  padding:14px;border-radius:16px;color:white;font-size:14px
 }
 .income{background:#f39c12}
 .expense{background:#e74c3c}
 .saldo{background:#1abc9c}
 .target{background:#3498db}
-
-/* FORM */
 input,button{
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  border-radius:14px;
-  border:1px solid #ddd;
-  font-size:14px;
+  width:100%;padding:12px;margin-top:8px;
+  border-radius:14px;border:1px solid #ddd;font-size:14px
 }
-button{
-  background:#3f8efc;
-  color:white;
-  border:none;
-  margin-top:12px;
-}
-
-/* NAV */
+button{background:#3f8efc;color:white;border:none;margin-top:12px}
 .bottom-nav{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  height:70px;
-  background:white;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow:0 -5px 15px rgba(0,0,0,.1);
+  position:fixed;bottom:0;left:0;right:0;height:70px;
+  background:white;display:flex;justify-content:space-around;
+  align-items:center;box-shadow:0 -5px 15px rgba(0,0,0,.1)
 }
-.bottom-nav button{
-  background:none;
-  border:none;
-  font-size:22px;
-}
+.bottom-nav button{background:none;border:none;font-size:22px}
+select{width:100%;padding:10px;border-radius:12px}
 </style>
 </head>
 
@@ -109,37 +64,34 @@ button{
   </div>
 
   <div class="card">
-    <h3>🎯 Progress Target Menabung</h3>
+    <h3>🎯 Progress Target</h3>
     <div style="background:#eee;border-radius:12px;overflow:hidden;height:16px">
-      <div id="progressBar" style="height:16px;width:0%;background:#3498db;transition:.4s"></div>
+      <div id="progressBar" style="height:16px;width:0%;background:#3498db"></div>
     </div>
-    <p style="margin-top:8px;font-size:13px">
-      <span id="progressText">0%</span> tercapai
-    </p>
+    <p><span id="progressText">0%</span> tercapai</p>
   </div>
 
   <div class="card">
-    <h3>📊 Ringkasan Keuangan</h3>
+    <h3>📊 Ringkasan</h3>
     <canvas id="barChart"></canvas>
   </div>
 
   <div class="card">
-    <h3>🥧 Tren Keuangan</h3>
-    <canvas id="trendChart"></canvas>
+    <h3>📅 Grafik Bulanan</h3>
+    <canvas id="monthlyChart"></canvas>
   </div>
 </div>
 
 <!-- INPUT -->
 <div id="input" class="page" style="display:none">
   <div class="card">
-    <h3>➕ Input Pemasukan</h3>
-    <input type="number" id="inAmount" placeholder="Jumlah pemasukan">
+    <h3>➕ Pemasukan</h3>
+    <input type="number" id="inAmount">
     <button onclick="addIncome()">Simpan</button>
   </div>
-
   <div class="card">
-    <h3>➖ Input Pengeluaran</h3>
-    <input type="number" id="outAmount" placeholder="Jumlah pengeluaran">
+    <h3>➖ Pengeluaran</h3>
+    <input type="number" id="outAmount">
     <button onclick="addExpense()">Simpan</button>
   </div>
 </div>
@@ -147,132 +99,123 @@ button{
 <!-- TARGET -->
 <div id="target" class="page" style="display:none">
   <div class="card">
-    <h3>🎯 Target Menabung</h3>
-    <input type="number" id="targetInput" placeholder="Target tabungan">
-    <button onclick="setTarget()">Simpan Target</button>
+    <h3>🎯 Target</h3>
+    <input type="number" id="targetInput">
+    <button onclick="setTarget()">Simpan</button>
   </div>
 </div>
 
 <!-- LAPORAN -->
 <div id="report" class="page" style="display:none">
   <div class="card">
-    <h3>📄 Laporan Keuangan</h3>
-    <p>Total Pemasukan: Rp <span id="rIn">0</span></p>
-    <p>Total Pengeluaran: Rp <span id="rOut">0</span></p>
-    <p>Saldo Akhir: Rp <span id="rSaldo">0</span></p>
-    <hr>
-    <p>🎯 Target tercapai dalam <b><span id="targetDays">-</span></b> hari</p>
-    <p>📅 Perkiraan tanggal tercapai: <b><span id="targetDate">-</span></b></p>
-    <p style="font-size:13px;opacity:.7">(Asumsi nabung Rp20.000 / hari)</p>
+    <h3>📄 Filter Laporan</h3>
+    <select id="filterType" onchange="updateUI()">
+      <option value="all">Semua</option>
+      <option value="month">Bulan Ini</option>
+      <option value="year">Tahun Ini</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <p>Pemasukan: Rp <span id="rIn">0</span></p>
+    <p>Pengeluaran: Rp <span id="rOut">0</span></p>
+    <p>Saldo: Rp <span id="rSaldo">0</span></p>
+  </div>
+</div>
+
+<!-- RESET -->
+<div id="reset" class="page" style="display:none">
+  <div class="card">
+    <h3>🔄 Reset Data</h3>
+    <button onclick="resetDaily()">Reset Hari Ini</button>
+    <button onclick="resetMonthly()">Reset Bulan Ini</button>
+    <button onclick="resetYearly()">Reset Tahun Ini</button>
   </div>
 </div>
 
 </div>
 
-<!-- NAV -->
 <div class="bottom-nav">
   <button onclick="showPage('dashboard')">🏠</button>
   <button onclick="showPage('input')">➕</button>
   <button onclick="showPage('target')">🎯</button>
   <button onclick="showPage('report')">📄</button>
+  <button onclick="showPage('reset')">🔄</button>
 </div>
 
 <script>
-let income = 0;
-let expense = 0;
-let target = 0;
+let records = JSON.parse(localStorage.getItem("records")) || [];
+let target = localStorage.getItem("target") || 0;
 
-/* BAR CHART */
-const barChart = new Chart(document.getElementById("barChart"),{
+/* CHART */
+const barChart=new Chart(barChart=document.getElementById("barChart"),{
   type:"bar",
-  data:{
-    labels:["Pemasukan","Pengeluaran","Saldo"],
-    datasets:[{
-      data:[0,0,0],
-      backgroundColor:["#f39c12","#e74c3c","#1abc9c"]
-    }]
-  },
+  data:{labels:["Masuk","Keluar","Saldo"],datasets:[{data:[0,0,0]}]},
   options:{plugins:{legend:{display:false}}}
 });
 
-/* PIE CHART */
-const trendChart = new Chart(document.getElementById("trendChart"),{
-  type:"doughnut",
-  data:{
-    labels:["Pemasukan","Pengeluaran","Saldo"],
-    datasets:[{
-      data:[0,0,0],
-      backgroundColor:["#f39c12","#e74c3c","#1abc9c"]
-    }]
-  },
-  options:{plugins:{legend:{position:"bottom"}}}
+const monthlyChart=new Chart(monthlyChart=document.getElementById("monthlyChart"),{
+  type:"line",
+  data:{labels:[],datasets:[
+    {label:"Masuk",data:[]},
+    {label:"Keluar",data:[]}
+  ]}
 });
 
+function save(){localStorage.setItem("records",JSON.stringify(records));localStorage.setItem("target",target);}
+
 function updateUI(){
-  const saldoVal = income - expense;
+  let inc=0,exp=0;
+  const now=new Date();
+  const f=document.getElementById("filterType")?.value||"all";
 
-  sumIn.textContent = income;
-  sumOut.textContent = expense;
-  saldo.textContent = saldoVal;
-  targetVal.textContent = target;
+  records.forEach(r=>{
+    const d=new Date(r.date);
+    if(f==="month"&&(d.getMonth()!==now.getMonth()||d.getFullYear()!==now.getFullYear()))return;
+    if(f==="year"&&d.getFullYear()!==now.getFullYear())return;
+    r.type==="in"?inc+=r.amount:exp+=r.amount;
+  });
 
-  rIn.textContent = income;
-  rOut.textContent = expense;
-  rSaldo.textContent = saldoVal;
+  sumIn.textContent=inc;
+  sumOut.textContent=exp;
+  saldo.textContent=inc-exp;
+  targetVal.textContent=target;
+  rIn.textContent=inc;
+  rOut.textContent=exp;
+  rSaldo.textContent=inc-exp;
 
-  barChart.data.datasets[0].data = [income, expense, saldoVal];
+  barChart.data.datasets[0].data=[inc,exp,inc-exp];
   barChart.update();
 
-  trendChart.data.datasets[0].data = [income, expense, Math.max(saldoVal,0)];
-  trendChart.update();
+  let months={},mIn=[],mOut=[],labels=[];
+  records.forEach(r=>{
+    const d=new Date(r.date);
+    const k=d.getMonth()+1+"/"+d.getFullYear();
+    if(!months[k])months[k]={in:0,out:0};
+    months[k][r.type]+=r.amount;
+  });
+  Object.keys(months).forEach(k=>{
+    labels.push(k);mIn.push(months[k].in);mOut.push(months[k].out);
+  });
+  monthlyChart.data.labels=labels;
+  monthlyChart.data.datasets[0].data=mIn;
+  monthlyChart.data.datasets[1].data=mOut;
+  monthlyChart.update();
 
-  /* PROGRESS TARGET */
-  if(target > 0){
-    const percent = Math.min((saldoVal / target) * 100, 100);
-    progressBar.style.width = percent + "%";
-    progressText.textContent = percent.toFixed(1) + "%";
-  }else{
-    progressBar.style.width = "0%";
-    progressText.textContent = "0%";
-  }
-
-  /* ESTIMASI TARGET */
-  const dailySave = 20000;
-  if(target > 0){
-    const remaining = target - saldoVal;
-    if(remaining <= 0){
-      targetDays.textContent = "Target sudah tercapai 🎉";
-      targetDate.textContent = "Hari ini";
-    }else{
-      const days = Math.ceil(remaining / dailySave);
-      targetDays.textContent = days;
-      const d = new Date();
-      d.setDate(d.getDate() + days);
-      targetDate.textContent = d.toLocaleDateString("id-ID");
-    }
-  }else{
-    targetDays.textContent = "-";
-    targetDate.textContent = "-";
-  }
+  save();
 }
 
-function addIncome(){
-  const v = Number(inAmount.value);
-  if(v>0){income+=v;inAmount.value="";updateUI();}
-}
-function addExpense(){
-  const v = Number(outAmount.value);
-  if(v>0){expense+=v;outAmount.value="";updateUI();}
-}
-function setTarget(){
-  const v = Number(targetInput.value);
-  if(v>0){target=v;updateUI();}
-}
-function showPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-  document.getElementById(id).style.display="block";
-}
+function addIncome(){const v=+inAmount.value;if(v>0){records.push({type:"in",amount:v,date:new Date()});inAmount.value="";updateUI();}}
+function addExpense(){const v=+outAmount.value;if(v>0){records.push({type:"out",amount:v,date:new Date()});outAmount.value="";updateUI();}}
+function setTarget(){target=+targetInput.value||0;updateUI();}
+function resetDaily(){const t=new Date().toDateString();records=records.filter(r=>new Date(r.date).toDateString()!==t);updateUI();}
+function resetMonthly(){const n=new Date();records=records.filter(r=>!(new Date(r.date).getMonth()===n.getMonth()&&new Date(r.date).getFullYear()===n.getFullYear()));updateUI();}
+function resetYearly(){const y=new Date().getFullYear();records=records.filter(r=>new Date(r.date).getFullYear()!==y);updateUI();}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.style.display="none");document.getElementById(id).style.display="block";}
+
+updateUI();
 </script>
 
 </body>
 </html>
+
